@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/EFD-2.2-Spring_16March2023/src/java/com/solers/delivery/Start.java</file>
+            <file>file:/C:/EFD-2.2-Spring_16March2023/src/java/com/solers/delivery/tools/LuceneExporter.java</file>
+            <file>file:/C:/EFD-2.2-Spring_16March2023/src/java/com/solers/security/ssl/SSLContextCreator.java</file>
+            <file>file:/C:/EFD-2.2-Spring_16March2023/src/java/com/solers/delivery/rest/connectors/SslClientHelper.java</file>
+            <file>file:/C:/EFD-2.2-Spring_16March2023/src/java/com/solers/security/jetty/SSLConnector.java</file>
+            <file>file:/C:/EFD-2.2-Spring_16March2023/src/java/com/solers/delivery/security/RestfulAuthenticationProvider.java</file>
+        </group>
+    </open-files>
+</project-private>

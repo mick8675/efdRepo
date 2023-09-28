@@ -1,0 +1,30 @@
+ant build_security
+ant build_security_jar
+
+ant build_ui
+ant build_ui_jar
+
+ant build_util
+ant build_util_jar
+
+ant build_inventory
+ant build_inventory_jar
+
+ant build_inventory_cifs
+ant build_inventory_cifs_jar
+
+ant build_inventory_fs
+ant build_inventory_fs_jar
+
+ant build_inventory_zip
+ant build_inventory_zip_jar
+
+ant build_jmx
+ant build_jmx_jar
+
+
+ant build_lucene
+ant build_lucene_jar
+
+ant build_main
+ant build_main_jar
