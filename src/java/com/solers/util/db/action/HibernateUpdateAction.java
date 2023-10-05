@@ -4,6 +4,105 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Properties;
+
+import org.apache.log4j.Logger;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.hibernate.tool.hbm2ddl.SchemaExport.Action;
+
+import com.solers.util.db.Database;
+import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.hibernate.tool.schema.TargetType;
+
+public class HibernateUpdateAction implements DatabaseAction {
+
+    private static final Logger log = Logger.getLogger(HibernateUpdateAction.class);
+    
+    private Properties hibernateProperties;
+    private Class<?> [] hibernateClasses;
+    
+    public void setHibernateProperties(Properties hibernateProperties) {
+        this.hibernateProperties = hibernateProperties;
+    }
+
+    public void setHibernateClasses(Class<?>[] hibernateClasses) {
+        this.hibernateClasses = Arrays.copyOf(hibernateClasses, hibernateClasses.length);
+    }
+    
+    @Override
+    public void execute(Database db) {
+        StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+            .applySettings(hibernateProperties)
+            .build();
+
+        MetadataSources metadataSources = new MetadataSources(serviceRegistry);
+
+        for (Class<?> clazz : hibernateClasses) {
+            metadataSources.addAnnotatedClass(clazz);
+        }
+
+        Metadata metadata = metadataSources.buildMetadata();
+
+        Connection conn = null;
+        Statement stmt = null;
+
+        try {
+            conn = db.getConnection();
+            stmt = conn.createStatement();
+            
+            SchemaUpdate schemaUpdate = new SchemaUpdate();
+            schemaUpdate.setHaltOnError(true);
+            schemaUpdate.setDelimiter(";");
+            schemaUpdate.execute(EnumSet.of(TargetType.DATABASE), metadata, serviceRegistry);
+
+
+
+
+        } catch (SQLException ex) {
+            log.error("Error updating hibernate", ex);
+        } finally {
+            close(stmt);
+            close(conn);
+            StandardServiceRegistryBuilder.destroy(serviceRegistry);
+        }
+    }
+    
+    private void close(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ignore) {
+                log.error("Error closing connection: " + ignore.getMessage(), ignore);
+            }
+        }
+    }
+    
+    private void close(Statement stmt) {
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException ignore) {
+                log.error("Error closing statement: " + ignore.getMessage(), ignore);
+            }
+        }
+    }
+}
+
+// DatabaseAction remains unchanged
+
+
+
+/*package com.solers.util.db.action;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -19,6 +118,8 @@ import org.hibernate.tool.schema.TargetType;
 
 import com.solers.util.db.Database;
 import java.util.EnumSet;
+import org.springframework.stereotype.Component;
+
 
 public class HibernateUpdateAction implements DatabaseAction 
 {
@@ -76,7 +177,7 @@ public class HibernateUpdateAction implements DatabaseAction
             schemaExport.setDelimiter(";");
 
             schemaExport.execute(EnumSet.of(TargetType.DATABASE), SchemaExport.Action.CREATE, metadata, serviceRegistry);
-
+            //schemaUpdate.execute(EnumSet.of(TargetType.SCRIPT), metadata.buildMetadata());
         } 
             catch (SQLException ex) 
         {
@@ -110,10 +211,101 @@ public class HibernateUpdateAction implements DatabaseAction
         }
     }
 }
-
+*/
 
 
 //original code is below
+/*
+package com.solers.util.db.action;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.Properties;
+
+import org.apache.log4j.Logger;
+import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+
+import com.solers.util.db.Database;
+
+public class HibernateUpdateAction implements DatabaseAction {
+    
+    private static final Logger log = Logger.getLogger(HibernateUpdateAction.class);
+    
+    private Properties hibernateProperties;
+    private Class<?> [] hibernateClasses;
+    
+    public void setHibernateProperties(Properties hibernateProperties) {
+        this.hibernateProperties = hibernateProperties;
+    }
+
+    public void setHibernateClasses(Class<?>[] hibernateClasses) {
+        this.hibernateClasses = Arrays.copyOf(hibernateClasses, hibernateClasses.length);
+    }
+    
+    @Override
+    public void execute(Database db) {
+        AnnotationConfiguration config = new AnnotationConfiguration();
+        config.setProperties(hibernateProperties);
+        
+        for (Class<?> clazz : hibernateClasses) {
+            config.addAnnotatedClass(clazz);
+        }
+        
+        Dialect dialect = Dialect.getDialect(hibernateProperties);
+        
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = db.getConnection();
+            stmt = conn.createStatement();
+            DatabaseMetadata meta = new DatabaseMetadata(conn, dialect);
+            
+            String [] sqlStatements = config.generateSchemaUpdateScript(dialect, meta);
+            for (String sql : sqlStatements) {
+                stmt.executeUpdate(sql);
+            }
+        } catch (SQLException ex) {
+            log.error("Error updating hibernate", ex);
+        } finally {
+            close(stmt);
+            close(conn);
+        }
+    }
+    
+    private void close(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ignore) {
+                log.error("Error closing connection: " + ignore.getMessage(), ignore);
+            }
+        }
+    }
+    
+    private void close(Statement stmt) {
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException ignore) {
+                log.error("Error closing statement: " + ignore.getMessage(), ignore);
+            }
+        }
+    }
+    
+}*/
+
+
+
+
+
+
+
+
+//_______________________________________________________________________________________
 /*package com.solers.util.db.action;
 
 import java.sql.Connection;

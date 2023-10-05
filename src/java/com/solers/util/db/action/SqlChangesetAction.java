@@ -29,6 +29,7 @@ import com.solers.util.db.SqlChangeSetManager;
 /**
  * @author <a href="mailto:kevin.conaway@solers.com">Kevin Conaway</a>
  */
+
 public class SqlChangesetAction implements DatabaseAction {
     
     private static final Logger log = Logger.getLogger(SqlChangesetAction.class);

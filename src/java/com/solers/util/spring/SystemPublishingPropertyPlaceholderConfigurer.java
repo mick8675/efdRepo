@@ -6,12 +6,11 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-
-//TODO: replace as this is deprecated.
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 
 /**
  * Publishes all resolved properties to the System using {@code System.setProperty(String,String)}
+ * 
  */
 public class SystemPublishingPropertyPlaceholderConfigurer extends PropertyPlaceholderConfigurer {
 
@@ -25,13 +24,93 @@ public class SystemPublishingPropertyPlaceholderConfigurer extends PropertyPlace
             String key = (String) e.nextElement();
             if (System.getProperty(key) == null) {
                 System.setProperty(key, properties.getProperty(key));
+                log.info("++++++++ Adding "+key+"="+System.getProperty(key)+"\n");
+            } else {
+               log.info("--------Already defined in system properties, skipping "+key+"="+System.getProperty(key)+"\n");
+               
+            }
+        }
+        log.info("All properties: " + properties);
+
+    }
+}
+
+
+
+
+
+
+
+/*package com.solers.util.spring;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.stereotype.Component;
+
+import java.util.Properties;
+
+
+@Component
+public class SystemPublishingPropertyPlaceholderConfigurer extends PropertySourcesPlaceholderConfigurer {
+
+    private static final Logger log = Logger.getLogger(SystemPublishingPropertyPlaceholderConfigurer.class);
+    
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        super.postProcessBeanFactory(beanFactory);
+
+        ConfigurableEnvironment env = (ConfigurableEnvironment) getAppliedPropertySources();
+
+        if (env != null) {
+            Properties properties = new Properties();
+            env.getPropertySources().forEach(ps -> {
+                if (ps instanceof PropertiesPropertySource) {
+                    properties.putAll(((PropertiesPropertySource) ps).getSource());
+                }
+            });
+
+            properties.forEach((key, value) -> {
+                String keyStr = String.valueOf(key);
+                if (System.getProperty(keyStr) == null) {
+                    System.setProperty(keyStr, String.valueOf(value));
+                } else {
+                    log.info(keyStr + " already defined in system properties, skipping");
+                }
+            });
+        }
+    }
+}
+*/
+
+
+/**
+ * Publishes all resolved properties to the System using {@code System.setProperty(String,String)}
+ */
+/*
+@Component
+public class SystemPublishingPropertyPlaceholderConfigurer extends PropertySourcesPlaceholderConfigurer{//PropertyPlaceholderConfigurer {
+
+    private static final Logger log = Logger.getLogger(SystemPublishingPropertyPlaceholderConfigurer.class);
+    
+    @Override
+    protected void processProperties(ConfigurableListableBeanFactory factory, Properties properties) throws BeansException {
+        super.postProcessBeanFactory(factory);//doProcessProperties(factory, (StringValueResolver) properties);
+        
+        for (Enumeration<?> e = properties.propertyNames(); e.hasMoreElements();) {
+            String key = (String) e.nextElement();
+            if (System.getProperty(key) == null) {
+                System.setProperty(key, properties.getProperty(key));
             } else {
                log.info(key+" already defined in system properties, skipping");
             }
         }
     }
 }
-
+*/
 
 
 

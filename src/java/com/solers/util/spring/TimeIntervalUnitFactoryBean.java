@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author <a href="mailto:kevin.conaway@solers.com">Kevin Conaway</a>
  */
-
+@Component
 public class TimeIntervalUnitFactoryBean implements FactoryBean {
 
     private long value;
